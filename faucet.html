@@ -1,0 +1,152 @@
+﻿<!--* Copyright (C) 2016 Augustus York Rushton Pash - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the license, which was distrubted with this code and located
+ * at: https://github.com/augustuspash/CentralDankDashboard
+ *
+ * You should have received a copy of the license with
+ * this file. If not, please visit: https://github.com/augustuspash/CentralDankDashboard
+ -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Dashboard</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="index.html">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li>
+                    <a href="dank.html">Dankness</a>
+                </li>
+                <li>
+                    <a href="meme.html">Memes</a>
+                </li>
+                <li>
+                    <a href="faucet.html">Faucet</a>
+                </li>
+                <li>
+                    <a href="dmx.html">Dank Meme Exchange</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="well" style="width:100%;"><span>Account: <span id="account"></span></span><span style="float:right;">Dankness: <span id="dankness"></span></span></div>
+                        <center>
+                            <img src="image\faucet.png" width="200" />
+                            <h1>Dankness Faucet</h1>
+                            <button id="payout" type="button" class="btn btn-default">Payout</button><br />
+                            <span id="info"></span>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Web3 JavaScript -->
+    <script src="js/web3.min.js"></script>
+    <script src="contracts/faucet.js"></script>
+    <script src="contracts/dankness.js"></script>
+
+    <!-- Scripts -->
+    <script>
+        window.addEventListener('load', function () {
+            if (typeof web3 !== 'undefined') {
+                web3 = new Web3(web3.currentProvider);
+            } else {
+                console.log('No web3? You should consider trying MetaMask!')
+                web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+            }
+
+            loadFaucet();
+            loadDankness();
+
+            var account = web3.eth.accounts[0];
+            $("#account").text(account);
+            var accountInterval = setInterval(function () {
+                if (web3.eth.accounts[0] !== account) {
+                    account = web3.eth.accounts[0];
+                    $("#account").text(account);
+                }
+            }, 100);
+
+            var balanceInterval = setInterval(function () {
+                Dankness.balanceOf.call(web3.eth.accounts[0], function (error, result) {
+                    if (!error) {
+                        $("#dankness").text(insertDecimal(result));
+                    } else {
+                        $("#dankness").text("error");
+                    }
+                });
+            }, 100);
+
+            $("#menu-toggle").click(function (e) {
+                e.preventDefault();
+                $("#wrapper").toggleClass("toggled");
+            });
+
+            $("#payout").click(function (e) {
+                $('#payout').prop('disabled', true);
+                $("#info").text("Loading...");
+                Faucet.payout({ from: web3.eth.accounts[0] }, function (error, result) {
+                    $('#payout').prop('disabled', false);
+                    $("#info").text("Finished!!!!!");
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

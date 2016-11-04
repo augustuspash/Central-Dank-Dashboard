@@ -1,0 +1,226 @@
+﻿<!--* Copyright (C) 2016 Augustus York Rushton Pash - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the license, which was distrubted with this code and located
+ * at: https://github.com/augustuspash/CentralDankDashboard
+ *
+ * You should have received a copy of the license with
+ * this file. If not, please visit: https://github.com/augustuspash/CentralDankDashboard
+ -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Dashboard</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="index.html">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li>
+                    <a href="dank.html">Dankness</a>
+                </li>
+                <li>
+                    <a href="meme.html">Memes</a>
+                </li>
+                <li>
+                    <a href="faucet.html">Faucet</a>
+                </li>
+                <li>
+                    <a href="dmx.html">Dank Meme Exchange</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="well" style="width:100%;"><span>Account: <span id="account"></span></span><span style="float:right;">Dankness: <span id="dankness"></span></span></div>
+                        <div class="well" style="width:100%">
+                            <h1>Dankness</h1>
+                            <h3>Transfer</h3>
+                                <div class="form-group">
+                                    <label>Amount:</label>
+                                    <input class="form-control" type="number" id="transferAmount" min="0" step="1" />
+                                </div>
+                                <div class="form-group">
+                                    <label>To Address:</label>
+                                    <input class="form-control" id="transferAddress" type="text" />
+                                </div>
+                                <button id="transfer" type="button" class="btn btn-default">Transfer</button>
+                            <h3>Transfer From</h3>
+                                <div class="form-group">
+                                    <label>Amount:</label>
+                                    <input class="form-control" type="number" id="transferFromAmount" min="0" step="1" />
+                                </div>
+                                <div class="form-group">
+                                    <label>To Address:</label>
+                                    <input class="form-control" id="transferFromToAddress" type="text" />
+                                </div>
+                                <div class="form-group">
+                                    <label>From Address:</label>
+                                    <input class="form-control" id="transferFromFromAddress" type="text" />
+                                </div>
+                                <button id="transferFrom" type="button" class="btn btn-default">Transfer From</button>
+                            <h3>Approve</h3>
+                                <div class="form-group">
+                                    <label>Amount:</label>
+                                    <input class="form-control" type="number" id="approveAmount" min="0" step="1" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Sender Address:</label>
+                                    <input class="form-control" id="approveAddress" type="text" />
+                                </div>
+                                <button id="approve" type="button" class="btn btn-default">Approve</button>
+                            <h3>Look Up Allowance</h3>
+                                <div class="form-group">
+                                    <label>Owner Address:</label>
+                                    <input class="form-control" id="allowanceOwner" type="text" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Sender Address:</label>
+                                    <input class="form-control" id="allowanceSender" type="text" />
+                                </div>
+                                <div id="allowanceResults" class="well">Results:</div>
+                                <button id="allowance" type="button" class="btn btn-default">Look Up</button>
+                            <h3>Look Up Balance</h3>
+                                <div class="form-group">
+                                    <label>Address:</label>
+                                    <input class="form-control" id="balanceAddress" type="text" />
+                                </div>
+                                <div id="balanceResults" class="well">Results:</div>
+                                <button id="balance" type="button" class="btn btn-default">Look Up</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Web3 JavaScript -->
+    <script src="js/web3.min.js"></script>
+    <script src="contracts/dankness.js"></script>
+
+    <!-- Scripts -->
+    <script>
+        window.addEventListener('load', function () {
+
+            if (typeof web3 !== 'undefined') {
+                web3 = new Web3(web3.currentProvider);
+            } else {
+                console.log('No web3? You should consider trying MetaMask!')
+                web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+            }
+
+            loadDankness();
+
+            var account = web3.eth.accounts[0];
+            $("#account").text(account);
+            var accountInterval = setInterval(function () {
+                if (web3.eth.accounts[0] !== account) {
+                    account = web3.eth.accounts[0];
+                    $("#account").text(account);
+                }
+            }, 100);
+
+            var balanceInterval = setInterval(function () {
+                Dankness.balanceOf.call(web3.eth.accounts[0], function (error, result) {
+                    if (!error) {
+                        $("#dankness").text(insertDecimal(result));
+                    } else {
+                        $("#dankness").text("error");
+                    }
+                });
+            }, 100);
+
+            $("#menu-toggle").click(function (e) {
+                e.preventDefault();
+                $("#wrapper").toggleClass("toggled");
+            });
+
+            $("#transfer").click(function (e) {
+                $('#transfer').prop('disabled', true);
+                Dankness.transfer($("#transferAddress").val(), balanceToInt(Number($("#transferAmount").val())), { from: web3.eth.accounts[0] }, function (error, results) {
+                    $('#transfer').prop('disabled', false);
+                });
+            });
+
+            $("#transferFrom").click(function (e) {
+                $('#transferFrom').prop('disabled', true);
+                Dankness.transferFrom($("#transferFromFromAddress").val(), $("#transferFromToAddress").val(), balanceToInt(Number($("#transferFromAmount").val())), { from: web3.eth.accounts[0] }, function (error, results) {
+                    $('#transferFrom').prop('disabled', false);
+                });
+            });
+
+            $("#approve").click(function (e) {
+                $('#approve').prop('disabled', true);
+                Dankness.approve($("#approveAddress").val(), balanceToInt(Number($("#approveAmount").val())), { from: web3.eth.accounts[0] }, function (error, results) {
+                    $('#approve').prop('disabled', false);
+                });
+            });
+
+            $("#allowance").click(function (e) {
+                $('#allowance').prop('disabled', true);
+                Dankness.allowance.call($("#allowanceOwner").val(), $("#allowanceSender").val(), function (error, results) {
+                    $("#allowanceResults").text("Results: " + insertDecimal(results.toNumber()));
+                    $('#allowance').prop('disabled', false);
+                });
+            });
+
+            $("#balance").click(function (e) {
+                $('#balance').prop('disabled', true);
+                Dankness.balanceOf.call($("#balanceAddress").val(), function (error, results) {
+                    $("#balanceResults").text("Results: " + insertDecimal(results.toNumber()));
+                    $('#balance').prop('disabled', false);
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
