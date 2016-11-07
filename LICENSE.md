@@ -6,7 +6,7 @@ as well as other intellectual property laws and treaties. This SOFTWARE PRODUCT 
 End User License Agreement
 
 This End User License Agreement ("EULA") is a legal agreement between you (either an individual or a single entity) and 
-Augustus York Rushton Pash with regard to the copyrighted Software, "Central Dank", (herein referred to as "SOFTWARE PRODUCT" or 
+Augustus York Rushton Pash with regard to the copyrighted Software, "Central Dank Dashboard", (herein referred to as "SOFTWARE PRODUCT" or 
 "SOFTWARE") provided with this EULA. The SOFTWARE PRODUCT includes computer software, the associated media, source code,
 any printed materials, and any "online" or electronic documentation. Use of any software and related documentation ("Software") 
 provided to you by Augustus York Rushton Pash in whatever form or media, will constitute your acceptance of these terms,
