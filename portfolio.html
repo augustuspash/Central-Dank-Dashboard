@@ -90,6 +90,7 @@
                         <div class="well" style="width:100%;"><span>Account: <span id="account"></span></span><span style="float:right;">Dankness: <span id="dankness"></span></span></div>
                         <div class="well" style="width:100%">
                             <button id="backup" type="button" class="btn btn-default pull-right inline">Backup Porfolio</button>
+                             <button id="loadRecords" type="button" class="btn btn-default pull-right inline">Load From Records</button>
                             <button id="loadBackup" type="button" class="btn btn-default pull-right inline">Load Backup</button>
                             <h1>Portfolio</h1>
                         </div>
@@ -229,10 +230,12 @@
                     account = web3.eth.accounts[0];
                     $("#account").text(account);
                 }
-            }, 100);
+            }, 500);
             
             var memeDataInterval = setInterval(function () {
-                loadMemeData($("#identifier").text());
+                 Memes.sharesOf.call(id, web3.eth.accounts[0], function (error, results) {
+                        $("#oShares").text(results.toNumber());
+                 });
             }, 500);
 
             var balanceInterval = setInterval(function () {
@@ -243,7 +246,7 @@
                         $("#dankness").text("error");
                     }
                 });
-            }, 100);
+            }, 500);
 
             $("#menu-toggle").click(function (e) {
                 e.preventDefault();
@@ -369,6 +372,19 @@
                     store.set('portfolio', data);
                     location.reload();
                 }
+            });
+            
+            $("#loadRecords").click(function () {
+                MemeRecord.recordLength.call(web3.eth.accounts[0], function (error, result) {
+                    var length = result.toNumber();
+                    for (var i = 0; i < length; i++) {
+                        MemeRecord.getRecord.call(web3.eth.accounts[0], i, function (error, result) {
+                            if (typeof result == 'string') {
+                                addMeme(result);
+                            }
+                        });
+                    }
+                });
             });
         } );
         
