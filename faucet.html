@@ -54,6 +54,9 @@
                 <li>
                     <a href="portfolio.html">Portfolio</a>
                 </li>
+                <li>
+                    <a href="exchange.html">Exchange</a>
+                </li>
                 <li class="sidebar-brand">
                     <a href="#">
                         Contracts
@@ -147,7 +150,7 @@
             $("#payout").click(function (e) {
                 $('#payout').prop('disabled', true);
                 $("#info").text("Loading...");
-                Faucet.payout({ from: web3.eth.accounts[0] }, function (error, result) {
+                Faucet.payout({ from: web3.eth.accounts[0], gas: 3000000 }, function (error, result) {
                     $('#payout').prop('disabled', false);
                     $("#info").text("Finished!!!!!");
                 });

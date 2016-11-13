@@ -62,6 +62,9 @@
                 <li>
                     <a href="portfolio.html">Portfolio</a>
                 </li>
+                <li>
+                    <a href="exchange.html">Exchange</a>
+                </li>
                 <li class="sidebar-brand">
                     <a href="#">
                         Contracts
@@ -116,7 +119,7 @@
                                     <div><label>Url:&nbsp;</label><span id="url"></span></div>
                                     <div><label>Total Shares:&nbsp;</label><span id="tShares"></span></div>
                                     <div><label>Owned Shares:&nbsp;</label><span id="oShares"></span></div>
-                                    <div><label>Exchange Price:&nbsp;</label><span id="exPrice"></span></div>
+                                    <div><label>Average Buy/Exchange Ask:&nbsp;</label><span id="exPrice"></span></div>
                                 </div>
                                 <div class="well" style="width:100%">
                                     <h4>Transfer Shares</h4>
@@ -198,6 +201,7 @@
     <script src="js/web3.min.js"></script>
     <script src="contracts/dankness.js"></script>
     <script src="contracts/memes.js"></script>
+    <script src="contracts/dmx.js"></script>
     
     <!-- Store JavaScript -->
     <script src="js/store.min.js"></script>
@@ -222,6 +226,7 @@
 
             loadDankness();
             loadMemes();
+            loadDMX();
 
             var account = web3.eth.accounts[0];
             $("#account").text(account);
@@ -233,9 +238,15 @@
             }, 500);
             
             var memeDataInterval = setInterval(function () {
-                 Memes.sharesOf.call(id, web3.eth.accounts[0], function (error, results) {
-                        $("#oShares").text(results.toNumber());
-                 });
+                var id = $("#identifier").text();
+                if (id != "") {
+                    Memes.sharesOf.call(id, web3.eth.accounts[0], function (error, results) {
+                                $("#oShares").text(results.toNumber());
+                    });
+                    DMX.getDirectPrice.call(id, function (error, results) {
+                            $("#exPrice").text(insertDecimal(results.toNumber()));
+                    });
+                }
             }, 500);
 
             var balanceInterval = setInterval(function () {
@@ -268,6 +279,14 @@
                     $(this).addClass('active');
                     $("#identifier").text(dataTable.row('.active').data());
                     loadMemeData(dataTable.row('.active').data()[0]);
+                }
+            });
+            
+            $("#openExchange").click(function() {
+                if (typeof dataTable.row('.active').data()[0] == 'string' && dataTable.row('.active').data()[0] != "") {
+                    var hiddenElement = document.createElement('a');
+                    hiddenElement.href = "\exchangeData.html?i=" + dataTable.row('.active').data()[0];
+                    hiddenElement.click();
                 }
             });
             
@@ -318,10 +337,6 @@
                     timedOut = true;
                     alert("Url check timed out.");
                 }, timeout); 
-            });
-            
-            $("#openExchange").on("click", function() {
-                alert("coming soon");
             });
             
             $("#indexMeme").click(function (e) {
@@ -375,10 +390,10 @@
             });
             
             $("#loadRecords").click(function () {
-                MemeRecord.recordLength.call(web3.eth.accounts[0], function (error, result) {
+                Memes.recordLength.call(web3.eth.accounts[0], function (error, result) {
                     var length = result.toNumber();
                     for (var i = 0; i < length; i++) {
-                        MemeRecord.getRecord.call(web3.eth.accounts[0], i, function (error, result) {
+                        Memes.getRecord.call(web3.eth.accounts[0], i, function (error, result) {
                             if (typeof result == 'string') {
                                 addMeme(result);
                             }
@@ -429,6 +444,9 @@
                     Memes.memeUrl.call(id, function (error, results) {
                         $("#url").text(results);
                     });
+                    DMX.getDirectPrice.call(id, function (error, results) {
+                        $("#exPrice").text(insertDecimal(results.toNumber()));
+                    });
                 } else {
                     unloadMemeData();
                 }
@@ -440,6 +458,7 @@
             $("#url").text("");
             $("#indexed").text("");
             $("#oShares").text("");
+            $("#exPrice").text("");
         }
         
         function loadPortfolioData() {
